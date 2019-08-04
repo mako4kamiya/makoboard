@@ -50,7 +50,7 @@ post '/post' do #post画面のフォームデータをDBに送る
 end
 
 #↓↓出来なかったやつ
-# post '/post' do
+# post '/post' dogi
 #     name = params[:name]
 #     email = params[:email]
 #     content = params[:content]
