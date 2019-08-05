@@ -36,7 +36,7 @@ end
 #セッションがあるかどうかの確認
 get '/' do
     if session[:user_id].nil? == true #セッションが空ならsigninを読み込む
-        redirect 'signin'
+        erb :home
     else #空じゃなかったらindexを読み込む
         redirect 'index'
     end
