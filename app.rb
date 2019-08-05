@@ -33,17 +33,21 @@ end
 #ルーティン
 ##
 
-# get '/index' do
-#     @posts = db.exec_params("SELECT * FROM posts")
-#     erb :index
-# end
+#セッションがあるかどうかの確認
+get '/' do
+    if session[:user_id].nil? == true #セッションが空ならsigninを読み込む
+        redirect 'signin'
+    else #空じゃなかったらindexを読み込む
+        redirect 'index'
+    end
+end
 
-#/registerにアクセスすると、登録画面が表示される。
+#/signupにアクセスすると、サインアップ（新規登録）画面が表示される。
 get '/signup' do
     erb :signup
 end
 
-#/registerにアクセスすると、記入した内容がデータベースに保存される。
+#signupで記入した内容がusersテーブルに保存される。
 post '/signup' do
     name = params[:name]
     email = params[:email]
@@ -52,23 +56,37 @@ post '/signup' do
     redirect '/signin'
 end
 
+#/signinにアクセスすると、サインイン画面が表示される。
 get '/signin' do
     erb :signin
 end
 
+#サインアップ（登録）されてるかの確認
 post '/signin' do
     name = params[:name]
     password = params[:password]
     puts "hello"
     user_id = db.exec("SELECT id FROM users WHERE name = $1 AND password = $2",[name,password]).first
-    session[:user_id] = user_id['id'] #ハッシュ（id）を指定して、値(1とか)を持ってきてる。
-    redirect '/index'
+    if user_id.nil? == true #signinで入力したnameとpasswordがusersテーブルに無ければ、signupを読み込む
+        redirect 'signup'
+    else #signinで入力したnameとpasswordがusersテーブルにあれば、その列のidをsessionに入れて、indexを読み込む。
+        session[:user_id] = user_id['id'] #ハッシュ（id）を指定して、値(1とか)を持ってきてる。
+        redirect 'index'
+    end
 end
 
 #/index にアクセスすると、掲示板の内容一覧と投稿画面が表示される
 get '/index' do
-    @posts = db.exec_params("SELECT * FROM posts")
-    erb :index
+    if session[:user_id].nil? == true #セッションが空ならsigninを読み込む
+        redirect 'signin'
+    else #空じゃなかったらindexを読み込む
+        active_user = session[:user_id]
+        @name = db.exec("SELECT name FROM users WHERE id = $1",[active_user]).first
+        puts "hello2"
+        puts @name
+        @posts = db.exec_params("SELECT * FROM posts")
+        erb :index
+    end
 end
 
 get '/post' do
@@ -77,11 +95,8 @@ end
 
 #/post にアクセスすると、投稿された内容がデータベースに保存される
 post '/post' do
-    name = params[:name]
-    email = params[:email]
     content = params[:content]
-    db.exec("INSERT INTO posts(name, email, content) VALUES($1,$2,$3)",[name,email,content])
-    redirect '/'
+    db.exec("INSERT INTO posts(content) VALUES($1)",[content])
+    redirect '/index'
 end
-
 

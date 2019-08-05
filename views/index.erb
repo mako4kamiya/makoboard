@@ -1,11 +1,10 @@
 
-<h1>こんにちは、<%#= @session[:user_name]%>さん</h1>
+<h1>こんにちは、<%= @name['name']%>さん</h1>
 
 <a href="/post">投稿</a>
 <% @posts.each do |post| %>
 <article>
-  <p>名前：<%= post['name'] %></p>
-  <p>メールアドレス：<%= post['email'] %></p>
+  <p>名前：</p>
   <p>内容：<%= post['content'] %></p>
 </article>
 <% end %>
