@@ -81,10 +81,8 @@ get '/index' do
         redirect 'signin'
     else #空じゃなかったらindexを読み込む
         active_user = session[:user_id]
-        @name = db.exec("SELECT name FROM users WHERE id = $1",[active_user]).first
-        puts "hello2"
-        puts @name
         @posts = db.exec_params("SELECT * FROM posts")
+        @active_user = db.exec("SELECT name FROM users WHERE id = $1",[active_user]).first
         erb :index
     end
 end
@@ -95,8 +93,13 @@ end
 
 #/post にアクセスすると、投稿された内容がデータベースに保存される
 post '/post' do
+    active_user = session[:user_id]
     content = params[:content]
-    db.exec("INSERT INTO posts(content) VALUES($1)",[content])
+    user_name = db.exec("SELECT name FROM users WHERE id = $1",[active_user]).first
+    name = user_name['name']
+    puts "hello"
+    p name
+    db.exec("INSERT INTO posts(user_id,content,name) VALUES($1,$2,$3)",[active_user,content,name])
     redirect '/index'
 end
 
