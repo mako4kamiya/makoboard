@@ -22,4 +22,5 @@ main {
 
 article {
   border: 1px solid lightgray;
+  margin: 10px;
 }
