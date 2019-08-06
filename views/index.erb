@@ -4,7 +4,7 @@
 <a href="/post">投稿</a>
 <% @posts.each do |post| %>
 <article>
-  <p>名前：<%= post['name']%></p>
+  <p>名前：<%= post['user_name']%></p>
   <p>内容：<%= post['content'] %></p>
 </article>
 <% end %>

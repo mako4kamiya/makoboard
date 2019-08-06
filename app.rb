@@ -66,11 +66,11 @@ post '/signin' do
     name = params[:name]
     password = params[:password]
     puts "hello"
-    user_id = db.exec("SELECT id FROM users WHERE name = $1 AND password = $2",[name,password]).first
-    if user_id.nil? == true #signinで入力したnameとpasswordがusersテーブルに無ければ、signupを読み込む
+    users_id = db.exec("SELECT id FROM users WHERE name = $1 AND password = $2",[name,password]).first
+    if users_id.nil? == true #signinで入力したnameとpasswordがusersテーブルに無ければ、signupを読み込む
         redirect 'signup'
     else #signinで入力したnameとpasswordがusersテーブルにあれば、その列のidをsessionに入れて、indexを読み込む。
-        session[:user_id] = user_id['id'] #ハッシュ（id）を指定して、値(1とか)を持ってきてる。
+        session[:user_id] = users_id['id'] #ハッシュ（id）を指定して、値(1とか)を持ってきてる。
         redirect 'index'
     end
 end
@@ -95,11 +95,10 @@ end
 post '/post' do
     active_user = session[:user_id]
     content = params[:content]
-    user_name = db.exec("SELECT name FROM users WHERE id = $1",[active_user]).first
-    name = user_name['name']
+    users_name = db.exec("SELECT name FROM users WHERE id = $1",[active_user]).first
+    user_name = users_name['name']
     puts "hello"
-    p name
-    db.exec("INSERT INTO posts(user_id,content,name) VALUES($1,$2,$3)",[active_user,content,name])
+    p user_name
+    db.exec("INSERT INTO posts(user_id,content,user_name) VALUES($1,$2,$3)",[active_user,content,user_name])
     redirect '/index'
 end
-
